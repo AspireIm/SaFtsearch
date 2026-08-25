@@ -3,10 +3,14 @@ use anyhow::Result;
 use std::path::Path;
 use walkdir::WalkDir;
 
-pub fn scan_root(root: impl AsRef<Path>, exclude_patterns: &[String]) -> Result<Vec<FileFeature>> {
+pub fn scan_root(
+    root: impl AsRef<Path>,
+    exclude_patterns: &[String],
+    follow_symlinks: bool,
+) -> Result<Vec<FileFeature>> {
     let mut features = Vec::new();
 
-    for entry in WalkDir::new(root) {
+    for entry in WalkDir::new(root).follow_links(follow_symlinks) {
         let entry = match entry {
             Ok(entry) => entry,
             Err(_) => continue, // 单个路径失败不影响整体扫描。

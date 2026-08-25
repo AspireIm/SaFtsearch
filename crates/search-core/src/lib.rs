@@ -29,7 +29,8 @@ impl Searcher {
         let mut features = Vec::new();
         for root in &config.roots {
             // 调用底层扫描器，收集所有文件特征
-            let mut root_features = scanner::scan_root(root, &config.exclude_patterns)?;
+            let mut root_features =
+                scanner::scan_root(root, &config.exclude_patterns, config.follow_symlinks)?;
             features.append(&mut root_features);
         }
         Ok(Searcher { features })
@@ -63,7 +64,7 @@ pub fn search(query_text: &str, root: &str, limit: usize) -> Result<Vec<SearchHi
     let config = IndexConfig {
         roots: vec![root.into()],
         exclude_patterns: vec!["target".into(), ".git".into(), "__pycache__".into()],
-        follow_symlink: false, // ✅ 修正：字段名为 follow_symlink（单数）
+        follow_symlinks: false,
     };
     search_with_config(&config, query_text, limit)
 }
@@ -75,6 +76,6 @@ pub fn default_config(root: &str) -> IndexConfig {
     IndexConfig {
         roots: vec![root.into()],
         exclude_patterns: vec!["target".into(), ".git".into(), "__pycache__".into()],
-        follow_symlink: false, // ✅ 修正
+        follow_symlinks: false,
     }
 }
